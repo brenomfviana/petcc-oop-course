@@ -1,4 +1,6 @@
 #include <iostream>
+#include <cstdlib>
+#include <unistd.h>
 #include <string>
 #include <map>
 #include <vector>
@@ -20,7 +22,7 @@ class Item {
         this->health = health;
         this->speed = speed;
         this->attack = attack;
-        this->defense = defense;
+        this->defense = defense + 1;
     }
 
     int get_id() {
@@ -43,7 +45,7 @@ class Item {
       return this->attack;
     }
 
-    int get_defense() {
+    float get_defense() {
       return this->defense;
     }
 };
@@ -105,6 +107,15 @@ class Bag {
       return nullptr;
     }
 
+    std::vector<int> get_items() {
+      std::vector<int> v;
+      for (std::map<Item*, int>::iterator it = this->items.begin();
+        it != this->items.end(); ++it) {
+          v.push_back(it->first->get_id());
+      }
+      return v;
+    }
+
     Item* pick_item(int item_id) {
       Item* item;
       for (std::map<Item*, int>::iterator it = this->items.begin();
@@ -136,24 +147,50 @@ class Player {
     }
 
     void attack(Player* p) {
-      p->health_p -= (this->attack_p * p->defense_p);
-      p->health_p = (p->health_p < 0 ? 0 : p->health_p);
+      p->set_health(p->get_health() - (((float) this->get_attack()) * p->get_defense()));
+      if (p->get_health() < 0) {
+        p->set_health(0);
+      }
     }
 
-    void use_item() {
-      // TODO
+    bool use_item(int item_id) {
+      Item* item = this->bag->pick_item(item_id);
+      if (item == nullptr) {
+        return false;
+      }
+      this->health_p += item->get_health();
+      this->speed_p += item->get_speed();
+      this->attack_p += item->get_attack();
+      this->defense_p *= item->get_defense();
+      return true;
     }
 
     bool is_dead() {
       return (this->health_p == 0);
     }
 
+    void set_health(int health_p) {
+      this->health_p = health_p;
+    }
+
     int get_health() {
-      return this->speed_p;
+      return this->health_p;
     }
 
     int get_speed() {
       return this->speed_p;
+    }
+
+    int get_attack() {
+      return this->attack_p;
+    }
+
+    float get_defense() {
+      return this->defense_p;
+    }
+
+    Bag* get_bag() {
+      return bag;
     }
 };
 
@@ -162,7 +199,7 @@ int main() {
   Item* item0 = new Item(0, "Item 0", 20, 0, 0,   0);
   Item* item1 = new Item(1, "Item 1",  0, 5, 0,   0);
   Item* item2 = new Item(2, "Item 2",  0, 0, 5,   0);
-  Item* item3 = new Item(3, "Item 3",  0, 0, 0, 1.5);
+  Item* item3 = new Item(3, "Item 3",  0, 0, 0, 0.5);
   // Create a list
   std::vector<Item*> items;
   items.push_back(item0);
@@ -175,48 +212,73 @@ int main() {
   amounts.push_back(2);
   amounts.push_back(2);
   amounts.push_back(1);
-  // Create bag
-  Bag* bag = new Bag(10, items, amounts);
-  // Drop an item
-  bag->drop_item(3, 1);
-  // Get an item
-  Item* item = bag->get_item(3);
-  if (item == nullptr) {
-    std::cout << "There is no Item 3 in the bag." << '\n';
-  }
-  // Drop an item
-  bag->drop_item(0, 1);
-  // Get an item
-  item = bag->get_item(0);
-  std::cout << "Selected item: " << item->get_name() << '\n';
-
+  // Create bags
+  Bag* bag1 = new Bag(10, items, amounts);
+  Bag* bag2 = new Bag(10, items, amounts);
   // Create players
-  Player p1(150, 15, 20, 0.5);
-  Player p2(100, 20, 20, 0.8);
+  Player p1(150, 15, 20, 0.5, bag1);
+  Player p2(100, 20, 20, 0.8, bag2);
   // Controller
   bool turn = false;
   if (p1.get_speed() > p2.get_speed()) {
     turn = true;
   }
   // Battle
+  // Random
+  srand(time(NULL));
   while(!p1.is_dead() && !p2.is_dead()) {
     std::cout << "Health (Player 1): " << p1.get_health() << '\n';
     std::cout << "Health (Player 2): " << p2.get_health() << '\n';
     if (turn) {
-      std::cout << "  Player 1 attacks Player 2" << '\n';
-      p1.attack(&p2); // TODO
-      turn = false;
+      int i = (rand() % (p1.get_bag()->get_items().size() + 1)) - 1;
+      if (i == -1) {
+        std::cout << "  Player 1 attacks Player 2" << '\n';
+        p1.attack(&p2);
+        turn = false;
+      } else {
+        if (p1.use_item(i)) {
+          std::cout << "  Player 1 uses item " << i << '\n';
+          // Using speed item, who is faster?
+          if (i == 1 && p1.get_speed() > p2.get_speed()) {
+            turn = true;
+          } else {
+            turn = false;
+          }
+        } else {
+          std::cout << "  Player 1 attacks Player 2" << '\n';
+          p1.attack(&p2);
+          turn = false;
+        }
+      }
     } else {
-      std::cout << "  Player 2 attacks Player 1" << '\n';
-      p2.attack(&p1); // TODO
-      turn = true;
+      int i = (rand() % (p1.get_bag()->get_items().size() + 1)) - 1;
+      if (i == -1) {
+        std::cout << "  Player 2 attacks Player 1" << '\n';
+        p2.attack(&p1);
+        turn = true;
+      } else {
+        if (p2.use_item(i)) {
+          std::cout << "  Player 2 uses item " << i << '\n';
+          // Using speed item, who is faster?
+          if (i == 1 && p2.get_speed() > p1.get_speed()) {
+            turn = false;
+          } else {
+            turn = true;
+          }
+        } else {
+          std::cout << "  Player 2 attacks Player 1" << '\n';
+          p2.attack(&p1);
+          turn = true;
+        }
+      }
     }
+    usleep(1000);
   }
   if (p1.is_dead()) {
-    std::cout << "Player 2 died, Player 1 won." << '\n';
+    std::cout << "Player 1 died, Player 2 won." << '\n';
   }
   if (p2.is_dead()) {
-    std::cout << "Player 1 died, Player 2 won." << '\n';
+    std::cout << "Player 2 died, Player 1 won." << '\n';
   }
   return 0;
 }

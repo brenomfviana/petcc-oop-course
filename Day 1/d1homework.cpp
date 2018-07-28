@@ -48,10 +48,10 @@ int main() {
     }
   }
   if (p1.is_dead()) {
-    std::cout << "Player 2 died, Player 1 won." << '\n';
+    std::cout << "Player 1 died, Player 2 won." << '\n';
   }
   if (p2.is_dead()) {
-    std::cout << "Player 1 died, Player 2 won." << '\n';
+    std::cout << "Player 2 died, Player 1 won." << '\n';
   }
   return 0;
 }
