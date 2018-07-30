@@ -45,11 +45,10 @@ class Item {
       return this->attack;
     }
 
-    float get_defense() {
+    int get_defense() {
       return this->defense;
     }
 };
-
 
 class Bag {
   private:
@@ -194,6 +193,78 @@ class Player {
     }
 };
 
+class Battle {
+  public:
+    Battle() { /* empty */ };
+
+    static int random_move(Player p) {
+      return (rand() % (p.get_bag()->get_items().size() + 1)) - 1;
+    };
+
+    static void battle(Player p1, Player p2) {
+      // Controller
+      bool turn = false;
+      if (p1.get_speed() > p2.get_speed()) {
+        turn = true;
+      }
+      // Battle
+      while(!p1.is_dead() && !p2.is_dead()) {
+        std::cout << "Health (Player 1): " << p1.get_health() << '\n';
+        std::cout << "Health (Player 2): " << p2.get_health() << '\n';
+        if (turn) {
+          int i = random_move(p1);
+          if (i == -1) {
+            std::cout << "  Player 1 attacks Player 2" << '\n';
+            p1.attack(&p2);
+            turn = false;
+          } else {
+            if (p1.use_item(i)) {
+              std::cout << "  Player 1 uses item " << i << '\n';
+              // Using speed item, who is faster?
+              if (i == 1 && p1.get_speed() > p2.get_speed()) {
+                turn = true;
+              } else {
+                turn = false;
+              }
+            } else {
+              std::cout << "  Player 1 attacks Player 2" << '\n';
+              p1.attack(&p2);
+              turn = false;
+            }
+          }
+        } else {
+          int i = random_move(p2);
+          if (i == -1) {
+            std::cout << "  Player 2 attacks Player 1" << '\n';
+            p2.attack(&p1);
+            turn = true;
+          } else {
+            if (p2.use_item(i)) {
+              std::cout << "  Player 2 uses item " << i << '\n';
+              // Using speed item, who is faster?
+              if (i == 1 && p2.get_speed() > p1.get_speed()) {
+                turn = false;
+              } else {
+                turn = true;
+              }
+            } else {
+              std::cout << "  Player 2 attacks Player 1" << '\n';
+              p2.attack(&p1);
+              turn = true;
+            }
+          }
+        }
+        usleep(1000);
+      };
+      if (p1.is_dead()) {
+        std::cout << "Player 1 died, Player 2 won." << '\n';
+      }
+      if (p2.is_dead()) {
+        std::cout << "Player 2 died, Player 1 won." << '\n';
+      }
+    }
+};
+
 int main() {
   // Create items
   Item* item0 = new Item(0, "Item 0", 20, 0, 0,   0);
@@ -218,67 +289,7 @@ int main() {
   // Create players
   Player p1(150, 15, 20, 0.5, bag1);
   Player p2(100, 20, 20, 0.8, bag2);
-  // Controller
-  bool turn = false;
-  if (p1.get_speed() > p2.get_speed()) {
-    turn = true;
-  }
   // Battle
-  // Random
-  srand(time(NULL));
-  while(!p1.is_dead() && !p2.is_dead()) {
-    std::cout << "Health (Player 1): " << p1.get_health() << '\n';
-    std::cout << "Health (Player 2): " << p2.get_health() << '\n';
-    if (turn) {
-      int i = (rand() % (p1.get_bag()->get_items().size() + 1)) - 1;
-      if (i == -1) {
-        std::cout << "  Player 1 attacks Player 2" << '\n';
-        p1.attack(&p2);
-        turn = false;
-      } else {
-        if (p1.use_item(i)) {
-          std::cout << "  Player 1 uses item " << i << '\n';
-          // Using speed item, who is faster?
-          if (i == 1 && p1.get_speed() > p2.get_speed()) {
-            turn = true;
-          } else {
-            turn = false;
-          }
-        } else {
-          std::cout << "  Player 1 attacks Player 2" << '\n';
-          p1.attack(&p2);
-          turn = false;
-        }
-      }
-    } else {
-      int i = (rand() % (p2.get_bag()->get_items().size() + 1)) - 1;
-      if (i == -1) {
-        std::cout << "  Player 2 attacks Player 1" << '\n';
-        p2.attack(&p1);
-        turn = true;
-      } else {
-        if (p2.use_item(i)) {
-          std::cout << "  Player 2 uses item " << i << '\n';
-          // Using speed item, who is faster?
-          if (i == 1 && p2.get_speed() > p1.get_speed()) {
-            turn = false;
-          } else {
-            turn = true;
-          }
-        } else {
-          std::cout << "  Player 2 attacks Player 1" << '\n';
-          p2.attack(&p1);
-          turn = true;
-        }
-      }
-    }
-    usleep(1000);
-  }
-  if (p1.is_dead()) {
-    std::cout << "Player 1 died, Player 2 won." << '\n';
-  }
-  if (p2.is_dead()) {
-    std::cout << "Player 2 died, Player 1 won." << '\n';
-  }
-  return 0;
+  Battle battle;
+  battle.battle(p1, p2);
 }
