@@ -61,8 +61,12 @@ class Bag {
     }
 
     void add_item(Item* item, int amount) {
-      this->items[item] = amount;
-      this->empty_slots--;
+      if (this->items.find(item) == this->items.end()) {
+        this->items[item] = amount;
+        this->empty_slots--;
+      } else {
+        this->items[item] += amount;
+      }
     }
 
     void drop_item(int item_id, int amount) {
