@@ -67,14 +67,18 @@ class Bag {
       // Inserts items
       if ((this->slots > items.size()) && (items.size() == amounts.size())) {
         for (int i = 0; i < items.size(); i++) {
-          this->items[items[i]] = amounts[i];
+          add_item(items[i], amounts[i]);
         }
       }
     }
 
     void add_item(Item* item, int amount) {
-      this->items[item] = amount;
-      this->empty_slots--;
+      if (this->items.find(item) == this->items.end()) {
+        this->items[item] = amount;
+        this->empty_slots--;
+      } else {
+        this->items[item] += amount;
+      }
     }
 
     void drop_item(int item_id, int amount) {
