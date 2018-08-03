@@ -47,23 +47,27 @@ class Item {
 
 class ConsumableItem: public Item {
   public:
-    ConsumableItem(int id, std::string name, int health, int speed, int attack,
-      float defence): Item(id, name, health, speed, attack, defence) { /* empty */ }
+    ConsumableItem(int id, std::string name, int health, int speed): Item(id, name,
+      health, speed, 0, 0) { /* empty */ }
 
     void print() {
+      std::cout << "id: " << this->id << std::endl;
       std::cout << "name: " << this->name << std::endl;
       std::cout << "health: " << this->health << std::endl;
+      std::cout << "speed: " << this->speed << std::endl;
     }
 };
 
 class Equipment: public Item {
   public:
-    Equipment(int id,std::string name, int attack, float defence) : Item(id, name,
-      0, 0, attack, defence) { /* empty */ }
+    Equipment(int id,std::string name, int attack, float defense) : Item(id, name,
+      0, 0, attack, defense) { /* empty */ }
 
     void print() {
+      std::cout << "id: " << this->id << std::endl;
       std::cout << "name: " << this->name << std::endl;
       std::cout << "attack: " << this->attack << std::endl;
+      std::cout << "defense: " << this->defense << std::endl;
     }
 };
 
