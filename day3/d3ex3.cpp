@@ -52,23 +52,27 @@ class Item {
 
 class ConsumableItem: public Item {
   public:
-    ConsumableItem(int id, std::string name, int health, int speed, int attack,
-      float defence): Item(id, name, health, speed, attack, defence) { /* empty */ }
+    ConsumableItem(int id, std::string name, int health, int speed): Item(id, name,
+      health, speed, 0, 0) { /* empty */ }
 
     void print() {
+      std::cout << "id: " << this->id << std::endl;
       std::cout << "name: " << this->name << std::endl;
       std::cout << "health: " << this->health << std::endl;
+      std::cout << "speed: " << this->speed << std::endl;
     }
 };
 
 class Equipment: public Item {
   public:
-    Equipment(int id,std::string name, int attack, float defence) : Item(id, name,
-      0, 0, attack, defence) { /* empty */ }
+    Equipment(int id,std::string name, int attack, float defense) : Item(id, name,
+      0, 0, attack, defense) { /* empty */ }
 
     void print() {
+      std::cout << "id: " << this->id << std::endl;
       std::cout << "name: " << this->name << std::endl;
       std::cout << "attack: " << this->attack << std::endl;
+      std::cout << "defense: " << this->defense << std::endl;
     }
 };
 
@@ -300,21 +304,15 @@ class Battle {
 
 int main() {
   // Create items
-  ConsumableItem* item0 = new ConsumableItem(0, "Item 0", 20, 0, 0,   0);
-  ConsumableItem* item1 = new ConsumableItem(1, "Item 1",  0, 5, 0,   0);
-  ConsumableItem* item2 = new ConsumableItem(2, "Item 2",  0, 0, 5,   0);
-  ConsumableItem* item3 = new ConsumableItem(3, "Item 3",  0, 0, 0, 1.5);
+  ConsumableItem* item0 = new ConsumableItem(0, "Item 0", 20, 0);
+  ConsumableItem* item1 = new ConsumableItem(1, "Item 1",  0, 1.5);
   // Create a list
   std::vector<ConsumableItem*> items;
   items.push_back(item0);
   items.push_back(item1);
-  items.push_back(item2);
-  items.push_back(item3);
   // Amounts
   std::vector<int> amounts;
   amounts.push_back(4);
-  amounts.push_back(2);
-  amounts.push_back(2);
   amounts.push_back(1);
   // Create bags
   Bag* bag1 = new Bag(10, items, amounts);
