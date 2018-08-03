@@ -9,20 +9,11 @@ class Item {
   protected:
     int id;
     std::string name;
-    int health;
-    int speed;
-    int attack;
-    float defense;
 
   public:
-    Item(int id, std::string name, int health, int speed, int attack,
-      float defense) {
+    Item(int id, std::string name) {
         this->id = id;
         this->name = name;
-        this->health = health;
-        this->speed = speed;
-        this->attack = attack;
-        this->defense = defense + 1;
     }
 
     int get_id() {
@@ -52,8 +43,10 @@ class Item {
 
 class ConsumableItem: public Item {
   public:
-    ConsumableItem(int id, std::string name, int health, int speed): Item(id, name,
-      health, speed, 0, 0) { /* empty */ }
+    ConsumableItem(int id, std::string name, int health, int speed): Item(id, name) {
+        this->health = health;
+        this->speed = speed;
+    }
 
     void print() {
       std::cout << "id: " << this->id << std::endl;
@@ -65,8 +58,10 @@ class ConsumableItem: public Item {
 
 class Equipment: public Item {
   public:
-    Equipment(int id,std::string name, int attack, float defense) : Item(id, name,
-      0, 0, attack, defense) { /* empty */ }
+    Equipment(int id,std::string name, int attack, float defense) : Item(id, name) {
+        this->attack = attack;
+        this->defense = defense + 1;
+    }
 
     void print() {
       std::cout << "id: " << this->id << std::endl;
