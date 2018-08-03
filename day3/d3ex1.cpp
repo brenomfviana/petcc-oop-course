@@ -195,7 +195,8 @@ class Player {
 
 class Battle {
   public:
-    Battle() { /* empty */ };
+    static int c1;
+    static int c2;
 
     static int random_move(Player p) {
       return (rand() % (p.get_bag()->get_items().size() + 1)) - 1;
@@ -258,12 +259,17 @@ class Battle {
       };
       if (p1.is_dead()) {
         std::cout << "Player 1 died, Player 2 won." << '\n';
+        Battle::c1++;
       }
       if (p2.is_dead()) {
         std::cout << "Player 2 died, Player 1 won." << '\n';
+        Battle::c2++;
       }
     }
 };
+
+int Battle::c1 = 0;
+int Battle::c2 = 0;
 
 int main() {
   // Create items
@@ -290,6 +296,11 @@ int main() {
   Player p1(150, 15, 20, 0.5, bag1);
   Player p2(100, 20, 20, 0.8, bag2);
   // Battle
-  Battle battle;
-  battle.battle(p1, p2);
+  Battle::battle(p1, p2);
+  Battle::battle(p1, p2);
+  Battle::battle(p1, p2);
+  Battle::battle(p1, p2);
+  Battle::battle(p1, p2);
+  std::cout << "The player 1 won " << Battle::c1 << " times." << '\n';
+  std::cout << "The player 2 won " << Battle::c2 << " times." << '\n';
 }
