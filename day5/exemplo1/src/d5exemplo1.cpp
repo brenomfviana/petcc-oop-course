@@ -1,8 +1,7 @@
-#include "d5exemplo1.h"
 #include <SFML/Graphics.hpp>
 
 void handle_input(sf::Event event, sf::RenderWindow & window);
-void draw();
+void draw(sf::RenderWindow & window);
 
 int main()
 {
@@ -20,7 +19,7 @@ int main()
 			handle_input(event, window);
 		}
 		window.clear(sf::Color::Black);
-		draw();
+		draw(window);
 		window.display();
 	}
 	return 0;
@@ -46,7 +45,13 @@ void handle_input(sf::Event event, sf::RenderWindow & window)
 	}
 }
 
-void draw()
+void draw(sf::RenderWindow & window)
 {
 	// Instancie aqui os objetos Drawable
+	sf::RectangleShape rectangle;
+	rectangle.setSize(sf::Vector2f(100, 100));
+	rectangle.setOutlineColor(sf::Color::Green);
+	rectangle.setOutlineThickness(5);
+	rectangle.setPosition(50, 50);
+	window.draw(rectangle);
 }
